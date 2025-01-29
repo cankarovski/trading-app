@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export const getBtcUsdPrices = async (step = 3600, limit = 24) => {
+export const getBtcEurPrices = async (step = 3600, limit = 24) => {
   try {
     const response = await axios.get(
-      "https://www.bitstamp.net/api/v2/ohlc/btcusd/",
+      "https://www.bitstamp.net/api/v2/ohlc/btceur/",
       {
         params: {
           step,
@@ -11,10 +11,21 @@ export const getBtcUsdPrices = async (step = 3600, limit = 24) => {
         },
       }
     );
-    console.log("data", response.data.data.ohlc);
     return response.data.data.ohlc;
   } catch (error) {
-    console.error("Error fetching BTC data:", error);
+    console.error("Error fetching BTC prices:", error);
+    return null;
+  }
+};
+
+export const getBtcEurTicker = async () => {
+  try {
+    const response = await axios.get(
+      "https://www.bitstamp.net/api/v2/ticker/btceur/"
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching BTC ticker:", error);
     return null;
   }
 };

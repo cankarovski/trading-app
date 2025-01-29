@@ -1,34 +1,49 @@
-import {
-  Image,
-  StyleSheet,
-  Platform,
-  AppStateStatus,
-  AppState,
-} from "react-native";
+import { StyleSheet, AppStateStatus, AppState, View } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getBtcUsdPrices } from "@/lib/api/prices";
+import { getBtcEurPrices, getBtcEurTicker } from "@/lib/api/prices";
 import { PriceData, setPriceData } from "@/lib/store/priceSlice";
-import { RootState } from "@/lib/store";
+import { AppDispatch, RootState } from "@/lib/store";
+import TradeDialog from "@/components/Dialog/TradeDialog";
+import ThemedButton from "@/components/Button/ThemedButton";
+import { resetAppState } from "@/lib/store/reset";
+import Trades from "@/components/Trades/Trades";
+import ContentScrollView from "@/components/ContentScrollView";
+import { Ticker, updateTicker } from "@/lib/store/tickerSlice";
+
+import useToast from "@/hooks/useToast";
+import PriceChart from "@/components/Chart/PriceChart";
+import CurrentTicker from "@/components/Ticker/CurrentTicker";
 
 export default function HomeScreen() {
-  const dispatch = useDispatch();
-  const priceData = useSelector((state: RootState) => state.price.data);
-  const portfolio = useSelector((state: RootState) => state.portfolio);
+  const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(true);
+  const [loadingTicker, setLoadingTicker] = useState(true);
+  const toast = useToast();
+
+  const [isDialogVisible, setDialogVisible] = useState(false);
+
+  const openDialogHandler = () => setDialogVisible(true);
+  const closeDialogHandler = () => setDialogVisible(false);
 
   const fetchData = () => {
     setLoading(true);
-    getBtcUsdPrices().then((data: PriceData[] | null) => {
+    getBtcEurPrices().then((data: PriceData[] | null) => {
       setLoading(false);
       if (data) {
         dispatch(setPriceData(data));
+      }
+    });
+
+    setLoadingTicker(true);
+    getBtcEurTicker().then((data: Ticker | null) => {
+      setLoadingTicker(false);
+      if (data) {
+        dispatch(updateTicker(data));
       }
     });
   };
@@ -48,89 +63,62 @@ export default function HomeScreen() {
       appStateChangeHandler
     );
 
+    // Set up periodic fetch every 5 seconds (5000ms)
+    const intervalId = setInterval(fetchData, 5000);
+
     return () => {
       subscription.remove();
+      clearInterval(intervalId);
     };
   }, []);
 
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">
-          USD Balance: {portfolio.usdBalance}
-        </ThemedText>
-        <ThemedText type="subtitle">
-          BTC Balance: {portfolio.btcBalance}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">
-          Loading: {loading ? "true" : "false"}
-        </ThemedText>
-      </ThemedView>
-      {priceData?.length ? (
-        priceData.map((data) => {
-          return (
-            <ThemedView key={data.timestamp} style={styles.stepContainer}>
-              <ThemedText type="subtitle">
-                {data?.timestamp}: {data?.close}
-              </ThemedText>
-            </ThemedView>
-          );
-        })
-      ) : (
-        <ThemedView>
-          <ThemedText type="subtitle">no data</ThemedText>
-        </ThemedView>
-      )}
+  const resetHandler = async () => {
+    try {
+      await resetAppState();
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
+      toast({
+        type: "success",
+        text1: "Success",
+        text2: "App state has been reset!",
+      });
+
+      fetchData();
+    } catch (error) {
+      console.error("Error resetting app state:", error);
+
+      toast({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to reset app state.",
+      });
+    }
+  };
+
+  return (
+    <ContentScrollView>
+      <CurrentTicker />
+
+      <PriceChart />
+
+      <ThemedView>
+        <ThemedButton
+          type="secondary"
+          text="Trade"
+          pressHandler={openDialogHandler}
+        />
+        <TradeDialog visible={isDialogVisible} onClose={closeDialogHandler} />
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
+
+      <Trades />
+
+      <ThemedView>
+        <ThemedButton
+          type="secondary"
+          text="RESET APP"
+          pressHandler={resetHandler}
+        />
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{" "}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    </ContentScrollView>
   );
 }
 
@@ -139,16 +127,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
   },
 });

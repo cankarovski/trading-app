@@ -1,14 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { TradeData } from "./tradesSlice";
 
 interface Portfolio {
   btcBalance: number;
-  usdBalance: number;
+  eurBalance: number;
 }
 
 const initialState: Portfolio = {
   btcBalance: 0.0,
-  usdBalance: 1000000.0,
+  eurBalance: 1000000.0,
 };
 
 const portfolioSlice = createSlice({
@@ -26,18 +27,18 @@ const portfolioSlice = createSlice({
       const { type, price, amount } = action.payload;
 
       if (type === "buy") {
-        const totalCost = price * amount;
+        const totalCost = price;
 
-        if (state.usdBalance >= totalCost) {
+        if (state.eurBalance >= totalCost) {
           state.btcBalance += amount;
-          state.usdBalance -= totalCost;
+          state.eurBalance -= totalCost;
         } else {
-          console.error("Insufficient USD balance to execute trade");
+          console.error("Insufficient EUR balance to execute trade");
         }
       } else if (type === "sell") {
         if (state.btcBalance >= amount) {
           state.btcBalance -= amount;
-          state.usdBalance += price * amount;
+          state.eurBalance += price * amount;
         } else {
           console.error("Insufficient BTC balance to execute trade");
         }
@@ -45,8 +46,11 @@ const portfolioSlice = createSlice({
     },
     resetPortfolio(state) {
       state.btcBalance = initialState.btcBalance;
-      state.usdBalance = initialState.usdBalance;
+      state.eurBalance = initialState.eurBalance;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase("RESET_APP", () => initialState);
   },
 });
 
