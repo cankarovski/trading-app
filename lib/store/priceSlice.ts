@@ -25,6 +25,9 @@ const priceSlice = createSlice({
       state.data = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase("RESET_APP", () => initialState);
+  },
 });
 
 export const { setPriceData } = priceSlice.actions;

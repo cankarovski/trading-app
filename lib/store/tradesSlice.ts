@@ -1,10 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { updatePortfolio } from "./portfolioSlice";
-import { AppDispatch } from ".";
+import { RootState } from ".";
 
 export interface TradeData {
-  timestamp: string;
+  timestamp?: string;
   price: string;
   amount: string;
   type: "buy" | "sell";
@@ -43,25 +43,45 @@ const tradesSlice = createSlice({
       state.data = [];
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase("RESET_APP", () => initialState);
+    builder.addCase(makeTrade.fulfilled, (state, action) => {
+      addTrade(action.payload); // Adding the trade if makeTrade is fulfilled
+    });
+  },
 });
 
-// Thunk to add trade and update user portfolio
-export const invokeTrade = (trade: {
-  price: string;
-  amount: string;
-  type: "buy" | "sell";
-}) => {
-  return (dispatch: AppDispatch) => {
-    dispatch(tradesSlice.actions.addTrade(trade));
-    dispatch(
-      updatePortfolio({
-        type: trade.type,
-        price: parseFloat(trade.price),
-        amount: parseFloat(trade.amount),
-      })
-    );
-  };
-};
+export const makeTrade = createAsyncThunk<
+  TradeData,
+  TradeData,
+  { rejectValue: string }
+>(
+  "trades/makeTrade",
+  async (trade: TradeData, { dispatch, getState, rejectWithValue }) => {
+    const state = getState(); // Get the state of the store
+    const portfolio = (state as RootState).portfolio;
+
+    const { amount, price, type } = trade;
+
+    // Check if the portfolio has enough balance before adding a trade
+    if (
+      (type === "buy" && portfolio.eurBalance >= parseFloat(price)) ||
+      (type === "sell" && portfolio.btcBalance >= parseFloat(amount))
+    ) {
+      dispatch(addTrade(trade));
+      dispatch(
+        updatePortfolio({
+          type: trade.type,
+          price: parseFloat(trade.price),
+          amount: parseFloat(trade.amount),
+        })
+      );
+      return trade;
+    } else {
+      return rejectWithValue("Insufficient balance");
+    }
+  }
+);
 
 export const { addTrade, clearTrades } = tradesSlice.actions;
 export default tradesSlice.reducer;

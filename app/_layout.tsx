@@ -14,6 +14,8 @@ import { store, persistor } from "../lib/store";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import Toast, { ToastConfig } from "react-native-toast-message";
+import { darkToastConfig } from "@/components/Toast/DarkToast";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -43,6 +45,13 @@ export default function RootLayout() {
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />
+          <Toast
+            config={
+              colorScheme === "dark"
+                ? (darkToastConfig as unknown as ToastConfig)
+                : undefined
+            }
+          />
         </PersistGate>
       </Provider>
     </ThemeProvider>

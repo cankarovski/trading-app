@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"; // Install
 import priceReducer from "./priceSlice";
 import tradesReducer from "./tradesSlice";
 import portfolioReducer from "./portfolioSlice";
+import tickerReducer from "./tickerSlice";
 import { combineReducers } from "redux";
 
 const persistConfig = {
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   price: priceReducer,
   trades: tradesReducer,
   portfolio: portfolioReducer,
+  ticker: tickerReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
