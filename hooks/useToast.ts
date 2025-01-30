@@ -1,6 +1,7 @@
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast, { ToastType } from "react-native-toast-message";
 
+
 type ToastProps = {
   type: ToastType;
   text1: string;

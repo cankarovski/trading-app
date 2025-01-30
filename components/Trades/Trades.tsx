@@ -6,6 +6,7 @@ import { RootState } from "@/lib/store";
 import { useSelector } from "react-redux";
 import { capitalize, formatCurrency, formatTime } from "@/lib/utils";
 
+
 export default function Trades() {
   const trades = useSelector((state: RootState) => state.trades.data);
 
