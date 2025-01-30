@@ -14,22 +14,19 @@ export default function CurrentTicker() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.text} type="title">
-        BTC
-      </ThemedText>
-      <ThemedText style={styles.text} type="title">
-        {formatCurrency(ticker?.last)}
-      </ThemedText>
-      <ThemedText>
+      <ThemedText type="title">BTC</ThemedText>
+      <ThemedText type="title">{formatCurrency(ticker?.last)}</ThemedText>
+      <ThemedText style={styles.text}>
         PnL:{" "}
         <ThemedText
-          style={
+          style={[
+            styles.text,
             pnl.totalSellRevenue === pnl.totalBuyCost
               ? undefined
               : pnl.totalSellRevenue > pnl.totalBuyCost
               ? styles.positive
-              : styles.negative
-          }
+              : styles.negative,
+          ]}
         >
           {formatCurrency(pnl.totalSellRevenue - pnl.totalBuyCost)}
         </ThemedText>
@@ -42,13 +39,16 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
   },
-  text: {
-    fontWeight: 500,
-  },
   positive: {
     color: "green",
   },
   negative: {
     color: "red",
+  },
+  text: {
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: 400,
   },
 });

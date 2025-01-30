@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Install this package if not already installed
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import priceReducer from "./priceSlice";
 import tradesReducer from "./tradesSlice";
 import portfolioReducer from "./portfolioSlice";

@@ -18,9 +18,9 @@ export default function useToast() {
       type,
       text1,
       text2,
-      position: "top", // You can change to 'bottom' or 'center'
-      visibilityTime: time, // Duration in ms
-      topOffset: insets.top, // Add the safe area top padding
+      position: "top",
+      visibilityTime: time,
+      topOffset: insets.top,
     });
   };
 
