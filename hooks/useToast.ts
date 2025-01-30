@@ -1,7 +1,6 @@
-import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast, { BaseToast, ToastType } from "react-native-toast-message";
-import { StyleSheet, Text, View } from "react-native";
+import Toast, { ToastType } from "react-native-toast-message";
+
 
 type ToastProps = {
   type: ToastType;
