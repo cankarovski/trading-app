@@ -46,7 +46,7 @@ const tradesSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase("RESET_APP", () => initialState);
     builder.addCase(makeTrade.fulfilled, (state, action) => {
-      addTrade(action.payload); // Adding the trade if makeTrade is fulfilled
+      addTrade(action.payload);
     });
   },
 });
@@ -58,7 +58,7 @@ export const makeTrade = createAsyncThunk<
 >(
   "trades/makeTrade",
   async (trade: TradeData, { dispatch, getState, rejectWithValue }) => {
-    const state = getState(); // Get the state of the store
+    const state = getState();
     const portfolio = (state as RootState).portfolio;
 
     const { amount, price, type } = trade;

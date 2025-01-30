@@ -21,9 +21,7 @@ const Header = () => {
       ]}
     >
       <Image
-        source={{
-          uri: "https://play-lh.googleusercontent.com/pMhtXmH2qS4g9GWAQAVq_WVArf4CB9qvgnSyF0StUGuOrLlcSsM91EspimwNxwhnmAsq=w480-h960-rw",
-        }} // Replace with your logo URL
+        source={require("../../assets/images/favicon.png")}
         style={styles.logo}
       />
 
@@ -47,11 +45,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   logo: {
     width: 60,
-    height: 60,
+    resizeMode: "contain",
     borderRadius: 10,
     alignSelf: "flex-end",
     marginBottom: 10,
@@ -64,7 +62,7 @@ const styles = StyleSheet.create({
   text: {
     textAlign: "right",
     lineHeight: 16,
-    fontSize: 14,
+    fontSize: 12,
     opacity: 0.8,
   },
 });

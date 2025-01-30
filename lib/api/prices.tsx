@@ -13,7 +13,7 @@ export const getBtcEurPrices = async (step = 3600, limit = 24) => {
     );
     return response.data.data.ohlc;
   } catch (error) {
-    console.error("Error fetching BTC prices:", error);
+    console.log("Error fetching BTC prices:", error);
     return null;
   }
 };
@@ -25,7 +25,7 @@ export const getBtcEurTicker = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching BTC ticker:", error);
+    console.log("Error fetching BTC ticker:", error);
     return null;
   }
 };

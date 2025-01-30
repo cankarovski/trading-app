@@ -1,16 +1,19 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedText } from "../ThemedText";
+import { AppColors } from "@/constants/Colors";
 
 type ThemedButtonProps = {
   type?: "primary" | "secondary";
   text: string;
+  width?: number;
   pressHandler: () => void;
 };
 
 export default function ThemedButton({
   text,
   type = "primary",
+  width,
   pressHandler,
 }: ThemedButtonProps) {
   return (
@@ -19,28 +22,34 @@ export default function ThemedButton({
         styles.button,
         type === "primary" ? styles.primary : undefined,
         type === "secondary" ? styles.secondary : undefined,
+        width ? { width } : undefined,
       ]}
       onPress={pressHandler}
       activeOpacity={0.7}
     >
-      <ThemedText type="subtitle">{text}</ThemedText>
+      <ThemedText style={styles.text}>{text}</ThemedText>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#4CAF50",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    backgroundColor: AppColors.button,
+    height: 48,
+    paddingHorizontal: 40,
+    borderRadius: 4,
     alignItems: "center",
     justifyContent: "center",
   },
+  text: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: "white",
+  },
   primary: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: AppColors.button,
   },
   secondary: {
-    backgroundColor: "#2196F3",
+    backgroundColor: AppColors.button,
   },
 });

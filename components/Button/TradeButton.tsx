@@ -4,11 +4,13 @@ import { useDispatch } from "react-redux";
 import { makeTrade } from "@/lib/store/tradesSlice";
 import ThemedButton from "./ThemedButton";
 import useToast from "@/hooks/useToast";
+import { capitalize, formatCurrency } from "@/lib/utils";
 
 type TradeButtonProps = {
   type: "buy" | "sell";
   price: string;
   amount: string;
+  width?: number;
   onSubmit?: () => void;
 };
 
@@ -16,6 +18,7 @@ export default function TradeButton({
   type,
   price,
   amount,
+  width,
   onSubmit,
 }: TradeButtonProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -38,7 +41,7 @@ export default function TradeButton({
           text1: "Trade was successful!",
           text2: `${trade.type === "buy" ? "Bought" : "Sold"} ${
             trade.amount
-          } BTC for ${trade.price} €`,
+          } BTC for ${formatCurrency(trade.price)}`,
         });
       })
       .catch((error: string) => {
@@ -53,5 +56,11 @@ export default function TradeButton({
     }
   };
 
-  return <ThemedButton text={type} pressHandler={pressHandler} />;
+  return (
+    <ThemedButton
+      width={width}
+      text={capitalize(type)}
+      pressHandler={pressHandler}
+    />
+  );
 }

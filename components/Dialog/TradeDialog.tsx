@@ -16,6 +16,7 @@ import { RootState } from "@/lib/store";
 
 import { ThemedView } from "../ThemedView";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { AppColors } from "@/constants/Colors";
 
 interface TradeDialogProps {
   visible: boolean;
@@ -40,14 +41,15 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ visible, onClose }) => {
 
   const syncInputs = (value: string, type: "eur" | "btc") => {
     const btcIndexNum = parseFloat(btcIndex);
-    if (!value) {
+    if (value == null || value === "") {
       setEurPrice("");
       setBtcPrice("");
       return;
     }
-
-    const regex = /^(\d+(\.\d{0,2})?)$/;
     value = value.replace(",", ".");
+    value = value.replace(/(\..*?)\./g, "$1");
+
+    const regex = /^[0-9.]*$/;
     if (!regex.test(value)) {
       return;
     }
@@ -55,13 +57,13 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ visible, onClose }) => {
     if (type === "eur") {
       setEurPrice(value);
       const valueNum = parseFloat(value);
-      setBtcPrice((valueNum / btcIndexNum).toPrecision(6).toString());
+      setBtcPrice((valueNum / btcIndexNum).toPrecision(7).toString());
       return;
     }
     if (type === "btc") {
       setBtcPrice(value);
       const valueNum = parseFloat(value);
-      setEurPrice((valueNum * btcIndexNum).toPrecision(6).toString());
+      setEurPrice((valueNum * btcIndexNum).toPrecision(7).toString());
       return;
     }
   };
@@ -84,7 +86,14 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ visible, onClose }) => {
             />
           </TouchableOpacity>
 
-          <View style={styles.inputRow}>
+          <View
+            style={[
+              styles.inputRow,
+              theme === "dark"
+                ? { backgroundColor: "rgba(255,255,255,0.1)" }
+                : undefined,
+            ]}
+          >
             <TextInput
               style={[
                 styles.input,
@@ -94,17 +103,17 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ visible, onClose }) => {
               onChangeText={(value) => syncInputs(value, "eur")}
               keyboardType="decimal-pad"
             />
-            <Text
-              style={[
-                styles.inputText,
-                theme === "dark" ? styles.light : undefined,
-              ]}
-            >
-              EUR
-            </Text>
+            <Text style={[styles.inputText]}>EUR</Text>
           </View>
 
-          <View style={styles.inputRow}>
+          <View
+            style={[
+              styles.inputRow,
+              theme === "dark"
+                ? { backgroundColor: "rgba(255,255,255,0.1)" }
+                : undefined,
+            ]}
+          >
             <TextInput
               style={[
                 styles.input,
@@ -114,14 +123,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ visible, onClose }) => {
               onChangeText={(value) => syncInputs(value, "btc")}
               keyboardType="decimal-pad"
             />
-            <Text
-              style={[
-                styles.inputText,
-                theme === "dark" ? styles.light : undefined,
-              ]}
-            >
-              BTC
-            </Text>
+            <Text style={[styles.inputText]}>BTC</Text>
           </View>
 
           <View style={styles.actions}>
@@ -130,12 +132,14 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ visible, onClose }) => {
               price={eurPrice}
               amount={btcPrice}
               onSubmit={closeHandler}
+              width={126}
             />
             <TradeButton
               type="sell"
               price={eurPrice}
               amount={btcPrice}
               onSubmit={closeHandler}
+              width={126}
             />
           </View>
         </ThemedView>
@@ -155,10 +159,10 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.8)",
   },
   dialog: {
-    width: Dimensions.get("window").width - 40,
-    borderRadius: 10,
-    padding: 10,
-    paddingTop: 40,
+    width: Dimensions.get("window").width - 48,
+    borderRadius: 12,
+    padding: 24,
+    paddingTop: 50,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -168,33 +172,34 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 5,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
+    top: 12,
+    right: 20,
   },
   inputRow: {
+    height: 48,
+    borderRadius: 4,
+    backgroundColor: AppColors.background,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
-    width: "90%",
+    marginBottom: 12,
+    width: "100%",
+    padding: 12,
   },
   input: {
+    borderWidth: 0,
+    borderColor: "transparent",
+    textAlign: "right",
     flex: 1,
-    height: 40,
-    borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 5,
+    fontSize: 16,
     paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.24)",
   },
   inputText: {
     marginLeft: 10,
-    fontSize: 16,
-    color: "#333",
+    fontSize: 12,
+    fontWeight: 700,
+    color: AppColors.secondaryAccent,
   },
 
   submitButton: {
@@ -210,9 +215,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   actions: {
+    marginTop: 12,
+    width: "100%",
     display: "flex",
     flexDirection: "row",
-    gap: 10,
+    justifyContent: "space-between",
+    gap: 24,
   },
 });
 
