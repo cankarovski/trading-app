@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
-import { LayoutChangeEvent, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { RootState } from "@/lib/store";
 import { useSelector } from "react-redux";
 import { capitalize, formatCurrency, formatTime } from "@/lib/utils";
-import { Colors } from "@/constants/Colors";
 
 export default function Trades() {
   const trades = useSelector((state: RootState) => state.trades.data);
